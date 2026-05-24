@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Kit - Veille Citoyenne</title>
+    
+    <!-- CSS de Phase 1 -->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel pour JSX -->
+    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Styles spécifiques à la présentation du UI Kit */
+        body { padding: 2rem; background-color: #F1F5F9; }
+        .uikit-container { max-width: 1200px; margin: 0 auto; background: var(--bg-main); padding: 3rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+        .uikit-header { margin-bottom: 3rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border-light); }
+        .uikit-section { margin-bottom: 4rem; }
+        .uikit-section-title { font-size: 1.5rem; color: var(--primary); margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; }
+        .component-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 3rem; }
+        .component-row { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; margin-bottom: 1.5rem; }
+        .component-col { display: flex; flex-direction: column; gap: 1.5rem; }
+        .state-label { font-size: 0.75rem; color: var(--text-disabled); font-family: var(--font-heading); text-transform: uppercase; margin-bottom: 0.5rem; display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- COMPOSANTS REACT (PHASE 1) ---
+
+        const Button = ({ variant = 'primary', className = '', children, icon, ...props }) => {
+            return (
+                <button className={`btn btn-${variant} ${className}`} {...props}>
+                    {icon && <i data-lucide={icon} width="18" height="18"></i>}
+                    {children}
+                </button>
+            );
+        };
+
+        const InputGroup = ({ label, placeholder, state, hint, type="text", ...props }) => {
+            const stateClass = state ? ` ${state}` : '';
+            return (
+                <div className="form-group">
+                    <label className="form-label">{label}</label>
+                    <input type={type} className={`form-control${stateClass}`} placeholder={placeholder} disabled={state === 'disabled'} {...props} />
+                    {state === 'error' && <span className="form-error-msg"><i data-lucide="alert-circle" width="16" height="16"></i> {hint}</span>}
+                    {state === 'success' && <span className="form-success-msg"><i data-lucide="check-circle" width="16" height="16"></i> {hint}</span>}
+                    {(!state || state === 'disabled') && hint && <span className="checkbox-card-desc">{hint}</span>}
+                </div>
+            );
+        };
+
+        const SelectGroup = ({ label, options, state, hint }) => {
+            const stateClass = state ? ` ${state}` : '';
+            return (
+                <div className="form-group">
+                    <label className="form-label">{label}</label>
+                    <select className={`form-control${stateClass}`} disabled={state === 'disabled'}>
+                        <option value="" disabled selected>Sélectionnez une option</option>
+                        {options.map(o => <option key={o}>{o}</option>)}
+                    </select>
+                    {state === 'error' && <span className="form-error-msg"><i data-lucide="alert-circle" width="16" height="16"></i> {hint}</span>}
+                </div>
+            );
+        };
+
+        const LegalCheckbox = () => {
+            return (
+                <label className="checkbox-card">
+                    <input type="checkbox" />
+                    <div className="checkbox-card-content">
+                        <span className="checkbox-card-title">Je certifie l'exactitude de ces informations</span>
+                        <span className="checkbox-card-desc">Tout faux signalement peut entraîner des poursuites légales. Votre adresse IP et vos informations de connexion sont enregistrées par sécurité.</span>
+                    </div>
+                </label>
+            );
+        };
+
+        const StatusBadge = ({ status }) => {
+            const labels = {
+                'soumis': 'Soumis',
+                'attente': 'En attente',
+                'valide': 'Validé',
+                'rejete': 'Rejeté',
+                'encours': 'En cours',
+                'resolu': 'Résolu',
+                'info': 'Information'
+            };
+            return (
+                <span className={`status-badge badge-${status}`}>
+                    {labels[status]}
+                </span>
+            );
+        };
+
+        const EmptyState = ({ title, description, icon }) => {
+            return (
+                <div className="empty-state">
+                    <div className="icon-wrapper">
+                        <i data-lucide={icon} width="48" height="48" strokeWidth="1.5"></i>
+                    </div>
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                    <Button variant="outline" icon="plus">Nouvelle action</Button>
+                </div>
+            );
+        };
+
+        // --- APPLICATION SHOWCASE ---
+        const App = () => {
+            React.useEffect(() => {
+                // Initialize icons after render
+                lucide.createIcons();
+            });
+
+            return (
+                <div className="uikit-container">
+                    <div className="uikit-header">
+                        <h1>Veille Citoyenne</h1>
+                        <p style={{ color: 'var(--text-secondary)' }}>UI Kit & Design System - Phase 1</p>
+                    </div>
+
+                    {/* TYPOGRAPHY & COLORS PREVIEW */}
+                    <div className="uikit-section">
+                        <h2 className="uikit-section-title"><i data-lucide="type"></i> Typographie & Couleurs</h2>
+                        <div className="component-grid">
+                            <div>
+                                <span className="state-label">Titres (Plus Jakarta Sans)</span>
+                                <h1>Titre H1</h1>
+                                <h2>Titre H2</h2>
+                                <h3>Titre H3</h3>
+                            </div>
+                            <div>
+                                <span className="state-label">Corps (Inter)</span>
+                                <p>Ceci est un texte standard pour les paragraphes et formulaires. Il offre une excellente lisibilité pour les interfaces denses et les écrans mobiles.</p>
+                                <span className="form-label">Label de formulaire (Semi-bold)</span><br/>
+                                <span className="checkbox-card-desc">Texte secondaire (Gris moyen)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* BOUTONS */}
+                    <div className="uikit-section">
+                        <h2 className="uikit-section-title"><i data-lucide="mouse-pointer-click"></i> Boutons</h2>
+                        
+                        <div className="component-row">
+                            <div>
+                                <span className="state-label">Primary (Institutionnel)</span>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <Button variant="primary">Valider</Button>
+                                    <Button variant="primary" icon="send">Envoyer</Button>
+                                    <Button variant="primary" disabled>Désactivé</Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="component-row">
+                            <div>
+                                <span className="state-label">Accent (Call to Action citoyen)</span>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <Button variant="accent">Signaler maintenant</Button>
+                                    <Button variant="accent" icon="alert-triangle">Alerte</Button>
+                                    <Button variant="accent" disabled>Désactivé</Button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="component-row">
+                            <div>
+                                <span className="state-label">Outline & Ghost (Secondaires)</span>
+                                <div style={{ display: 'flex', gap: '1rem' }}>
+                                    <Button variant="outline">Annuler</Button>
+                                    <Button variant="ghost" icon="x">Fermer</Button>
+                                    <Button variant="outline" disabled>Désactivé</Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* STATUS BADGES */}
+                    <div className="uikit-section">
+                        <h2 className="uikit-section-title"><i data-lucide="tags"></i> Status Badges</h2>
+                        <span className="state-label">Aperçu des 6 statuts du workflow institutionnel + Événement</span>
+                        <div className="component-row" style={{ gap: '1rem', background: '#FFFFFF', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                            <StatusBadge status="soumis" />
+                            <StatusBadge status="attente" />
+                            <StatusBadge status="valide" />
+                            <StatusBadge status="rejete" />
+                            <StatusBadge status="encours" />
+                            <StatusBadge status="resolu" />
+                            <div style={{ width: '1px', height: '24px', background: 'var(--border-light)', margin: '0 0.5rem' }}></div>
+                            <StatusBadge status="info" />
+                        </div>
+                    </div>
+
+                    {/* FORMULAIRES */}
+                    <div className="uikit-section">
+                        <h2 className="uikit-section-title"><i data-lucide="edit-3"></i> Champs de Formulaire</h2>
+                        
+                        <div className="component-grid">
+                            <div className="component-col">
+                                <div>
+                                    <span className="state-label">État Normal</span>
+                                    <InputGroup label="Nom complet" placeholder="Ex: Thomas Sankara" />
+                                </div>
+                                <div>
+                                    <span className="state-label">État Focus (Simulé)</span>
+                                    {/* Pour simuler le focus on triche un peu en forcant la classe sur un input normal ou on laisse le CSS agir au clic */}
+                                    <InputGroup label="Numéro de téléphone" placeholder="Ex: +226 00 00 00 00" hint="Cliquez pour voir l'état Focus" />
+                                </div>
+                            </div>
+
+                            <div className="component-col">
+                                <div>
+                                    <span className="state-label">État Erreur</span>
+                                    <InputGroup label="Lieu de l'incident" placeholder="Avenue de l'Indépendance" state="error" hint="Ce champ est obligatoire pour l'intervention." />
+                                </div>
+                                <div>
+                                    <span className="state-label">État Succès</span>
+                                    <InputGroup label="Code de vérification" placeholder="123456" state="success" hint="Code validé avec succès." />
+                                </div>
+                            </div>
+
+                            <div className="component-col">
+                                <div>
+                                    <span className="state-label">État Désactivé</span>
+                                    <InputGroup label="Identifiant Unique" placeholder="VC-2024-001" state="disabled" hint="Généré automatiquement" />
+                                </div>
+                                <div>
+                                    <span className="state-label">Select Group</span>
+                                    <SelectGroup label="Type d'incident" options={['Vol / Cambriolage', 'Accident de la route', 'Incendie', 'Activité suspecte']} />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="component-row" style={{ marginTop: '2rem' }}>
+                            <div style={{ width: '100%', maxWidth: '600px' }}>
+                                <span className="state-label">Composant LegalCheckbox (Obligatoire)</span>
+                                <LegalCheckbox />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* EMPTY STATE */}
+                    <div className="uikit-section">
+                        <h2 className="uikit-section-title"><i data-lucide="layout"></i> Empty State (État vide)</h2>
+                        <span className="state-label">Aperçu lorsqu'aucune donnée n'est disponible (Dashboard)</span>
+                        <EmptyState 
+                            title="Aucune alerte en attente" 
+                            description="Vous avez traité tous les signalements de votre zone de compétence. Excellent travail !"
+                            icon="check-circle-2"
+                        />
+                    </div>
+
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
